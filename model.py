@@ -12,20 +12,20 @@ class DCTI:
         self.num_epoch = num_epoch
         self.learning_rate = learning_rate
         self.regularization_rate = regularization_rate
-        self.use_regularization = False if self.regularization_rate is None else True
 
         self.images = tf.placeholder(shape=[None, 32, 32, 3], dtype=FLOAT_TYPE)
         self.labels = tf.placeholder(shape=[None, 10], dtype=FLOAT_TYPE)
 
         #self.weights_initializer=tf.truncated_normal_initializer(0.0, 0.01)
-
-        if not self.use_regularization:
+        with slim.arg_scope([slim.conv2d, slim.fully_connected], \
+                weights_initializer=tf.truncated_normal_initializer(mean=0.0, stddev=0.1, seed=0)):
             self.net=  self.build_network()
-        else:
-            self.regularizer = slim.l2_regularizer(self.regularization_rate)
-            with slim.arg_scope([slim.conv2d, slim.fully_connected], \
-                    weights_regularizer=self.regularizer):
-                self.net = self.build_network()
+
+        #else:
+        #    self.regularizer = slim.l2_regularizer(self.regularization_rate)
+        #    with slim.arg_scope([slim.conv2d, slim.fully_connected], \
+        #            weights_regularizer=self.regularizer):
+        #        self.net = self.build_network()
 
         self.logdir = logdir
 
@@ -87,11 +87,15 @@ class DCTI:
         return total_loss / float(length), total_accuracy / float(length)
 
     def train(self, sess, images, labels):
-        self.softmax_loss = slim.losses.softmax_cross_entropy(self.net, self.labels)
-        if self.use_regularization:
-            self.regularization_loss = tf.add_n(slim.losses.get_regularization_losses())
-        self.loss = slim.losses.get_total_loss()
-        #self.loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=self.net, labels=self.labels))
+        #self.softmax_loss = slim.losses.softmax_cross_entropy(self.net, self.labels)
+        #if self.use_regularization:
+        #    self.regularization_loss = tf.add_n(slim.losses.get_regularization_losses())
+        #self.loss = slim.losses.get_total_loss()
+
+        self.softmax_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=self.net, labels=self.labels))
+        vars = tf.trainable_variables()
+        self.regularization_loss = tf.add_n([ tf.nn.l2_loss(v) for v in vars ]) * self.regularization_rate
+        self.loss = self.softmax_loss + self.regularization_loss
 
         self.optimizer = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         self.accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(self.net, axis=1), tf.argmax(self.labels, axis=1)), FLOAT_TYPE))
