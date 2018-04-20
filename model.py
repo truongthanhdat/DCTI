@@ -2,6 +2,7 @@ import tensorflow as tf
 import tensorflow.contrib.slim as slim
 import numpy as np
 import sys
+import time
 
 FLOAT_TYPE = tf.float32
 
@@ -91,13 +92,15 @@ class DCTI:
         iter = 0
         while (first < length):
             last = min(length, first + self.batch_size)
+            duration = time.time()
             loss, accuracy = self.backward(sess, images[first:last], labels[first:last])
+            duration = time.time() - duration
             total_loss = total_loss + loss * (last - first)
             total_accuracy = total_accuracy + accuracy * (last - first)
             first = last
             iter = iter + 1
             sys.stdout.write("\033[F") # Cursor up one line
-            print '\tIteration %d: Loss: %.5f Accuracy: %.2f' % (iter, loss, accuracy * 100) + '%'
+            print '\tIteration %d: Loss: %.5f Accuracy: %.2f' % (iter, loss, accuracy * 100) + '%' + ' Time: %f second' % (duration)
 
         return total_loss / float(length), total_accuracy / float(length)
 
@@ -129,8 +132,10 @@ class DCTI:
         model_path = self.model_dir + '/model%d'
         for iter in xrange(1, self.num_epoch + 1):
             print 'Epoch %d\n' % iter
+            duration = time.time()
             loss, accuracy = self.epoch(sess, images, labels)
-            print '\tResult: Loss: %.5f Accuracy: %.2f' % (loss, accuracy * 100) + '%'
+            duration = time.time() - duration
+            print '\tResult: Loss: %.5f Accuracy: %.2f' % (loss, accuracy * 100) + '%' + ' Time: %f second' % (duration)
             saver.save(sess, model_path % iter)
 
 
