@@ -154,14 +154,18 @@ class DCTI:
         total_accuracy = 0.0
         iter = 0
         print 'Evaluate\n'
+        total_duration = time.time()
         while (first < length):
             last = min(length, first + self.batch_size)
+            duration = time.time()
             accuracy = sess.run(self.accuracy, feed_dict={self.images: images[first:last], self.labels: labels[first:last]})
+            duration = time.time() - duration
             total_accuracy = total_accuracy + accuracy * (last - first)
             first = last
             sys.stdout.write("\033[F") # Cursor up one line
-            print 'Accuracy on batch %d: %f' % (iter + 1, accuracy * 100) + '%'
+            print '\tAccuracy on batch %d: %f' % (iter + 1, accuracy * 100) + '%' + ' Forward time: %f second' % duration
             iter = iter + 1
-        print 'Accuracy: %f' % (total_accuracy * 100 / float(length)) + '%'
+        total_duration = time.time() - total_duration
+        print 'Accuracy: %f' % (total_accuracy * 100 / float(length)) + '%' + ' Test time: %f second' % total_duration
 
 
