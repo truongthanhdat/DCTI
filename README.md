@@ -8,7 +8,34 @@
 
 ## Dataset
 
-+ Download dataset python version [link](https://www.cs.toronto.edu/~kriz/cifar.html)
++ Dataset: CIFAR-10, CIFAR-100 ([Original dataset link](https://www.cs.toronto.edu/~kriz/cifar.html))
+
++ Dataset use for training and testing is available [here]
+
+## Training
+
+```bash
+    python train.py --dataset cifar10 --learning_rate 0.001 --regularization_rate 0.005 --batch_size 128 --num_epoch 100
+```
+
++ For more detail:
+
+```bash
+    python train.py -h
+```
+
+## Testing
+
+```bash
+    python test.py --dataset cifar10  --batch_size 128
+```
+
++ For more detail:
+
+```bash
+    python test.py -h
+```
+
 
 ## Author:
 
