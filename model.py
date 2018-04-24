@@ -25,7 +25,8 @@ class DCTI:
         self.labels = tf.placeholder(shape=[None, self.num_class], dtype=FLOAT_TYPE)
         with slim.arg_scope([slim.conv2d, slim.fully_connected], \
                 weights_initializer=tf.truncated_normal_initializer(mean=0.0, stddev=0.01, seed=seed), \
-                trainable=self.is_training):
+                trainable=self.is_training, \
+                normalizer_fn=slim.batch_norm, normalizer_params={'is_training': self.is_training}):
             self.net=  self.build_network(is_training=self.is_training)
 
         #Softmax loss
@@ -99,7 +100,6 @@ class DCTI:
         # Fully Connected
         net = slim.flatten(net, scope='flatten')                                            #Flatten
         net = slim.fully_connected(net, self.num_class, activation_fn=None, scope='fc')     #Fully Connected: 512 >> 10
-        net = slim.batch_norm(net)                                                          #Batch Norm
 
         return net
 
