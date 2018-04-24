@@ -15,8 +15,8 @@ def parse_args():
     return parser.parse_args()
 
 if __name__ == '__main__':
-    oimages, labels = parse_data_cifar100()
-ptions = parse_args()
+    options = parse_args()
+
     if options.dataset == 'cifar10':
         NUM_CLASS = 10
     elif options.dataset == 'cifar100':
