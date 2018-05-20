@@ -12,6 +12,11 @@
 
 + Dataset use for training and testing is available [here](https://drive.google.com/file/d/14h-sRyIXzNZTUMNn1GMXN8pJOZAxPJcg/view?usp=sharing)
 
+## Model
+
+![model](model.png)
+
+
 ## Training
 
 ```bash
